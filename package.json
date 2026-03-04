@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "db:seed": "tsx prisma/seed.ts",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.ts",
@@ -35,6 +36,7 @@
     "@types/pg": "^8.16.0",
     "prisma": "^7.4.1",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
