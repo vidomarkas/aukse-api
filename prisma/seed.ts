@@ -17,13 +17,14 @@ const defaultCategories = [
 ]
 
 async function main() {
-  for (const category of defaultCategories) {
-    await prisma.category.upsert({
-      where: { id: category.name },
-      update: {},
-      create: category,
-    })
+  // Skip seeding if default (global) categories already exist
+  const existing = await prisma.category.count({ where: { householdId: null } })
+  if (existing > 0) {
+    console.log(`Default categories already seeded (${existing} found), skipping`)
+    return
   }
+
+  await prisma.category.createMany({ data: defaultCategories })
   console.log("Seeded default categories")
 }
 
