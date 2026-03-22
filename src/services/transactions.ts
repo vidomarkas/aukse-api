@@ -48,6 +48,7 @@ export async function listTransactions(input: ListTransactionsInput) {
         category: true,
         account: true,
         tags: { include: { tag: true } },
+        user: { select: { id: true, name: true, email: true } },
       },
       orderBy: { date: "desc" },
       skip,

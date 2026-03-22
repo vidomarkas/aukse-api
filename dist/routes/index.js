@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const transactions_1 = __importDefault(require("./transactions"));
+const households_1 = __importDefault(require("./households"));
+const accounts_1 = __importDefault(require("./accounts"));
+const categories_1 = __importDefault(require("./categories"));
+const budgets_1 = __importDefault(require("./budgets"));
+const webhooks_1 = __importDefault(require("./webhooks"));
+const analytics_1 = __importDefault(require("./analytics"));
+const invitations_1 = __importDefault(require("./invitations"));
+const router = (0, express_1.Router)();
+router.use("/webhooks", webhooks_1.default);
+router.use("/transactions", transactions_1.default);
+router.use("/households", households_1.default);
+router.use("/accounts", accounts_1.default);
+router.use("/categories", categories_1.default);
+router.use("/budgets", budgets_1.default);
+router.use("/analytics", analytics_1.default);
+router.use("/invitations", invitations_1.default);
+exports.default = router;

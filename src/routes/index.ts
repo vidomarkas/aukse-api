@@ -6,6 +6,7 @@ import categoryRoutes from "./categories"
 import budgetRoutes from "./budgets"
 import webhookRoutes from "./webhooks"
 import analyticsRoutes from "./analytics"
+import invitationRoutes from "./invitations"
 
 
 
@@ -19,6 +20,7 @@ router.use("/accounts", accountRoutes)
 router.use("/categories", categoryRoutes)
 router.use("/budgets", budgetRoutes)
 router.use("/analytics", analyticsRoutes)
+router.use("/invitations", invitationRoutes)
 
 
 
