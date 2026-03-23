@@ -12,8 +12,11 @@ const defaultCategories = [
   { name: "Housing", icon: "🏠", color: "#14b8a6", isIncome: false },
   { name: "Health", icon: "🏥", color: "#ef4444", isIncome: false },
   { name: "Entertainment", icon: "🎬", color: "#f59e0b", isIncome: false },
+  { name: "Travel", icon: "✈️", color: "#6366f1", isIncome: false },
+  { name: "Other", icon: "📦", color: "#6b7280", isIncome: false },
   { name: "Salary", icon: "💰", color: "#22c55e", isIncome: true },
   { name: "Freelance", icon: "💻", color: "#06b6d4", isIncome: true },
+  { name: "Other Income", icon: "📥", color: "#84cc16", isIncome: true },
 ]
 
 async function main() {
