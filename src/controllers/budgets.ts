@@ -12,7 +12,7 @@ export async function getAll(req: Request, res: Response) {
     res.status(400).json({ error: "householdId is required" })
     return
   }
-  const budgets = await budgetService.getBudgetsForHousehold(householdId)
+  const budgets = await budgetService.getBudgetsWithSpending(householdId)
   res.json(budgets)
 }
 

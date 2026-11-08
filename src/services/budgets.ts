@@ -45,6 +45,42 @@ export async function deleteBudget(id: string) {
   })
 }
 
+export async function getBudgetsWithSpending(householdId: string) {
+  const budgets = await getBudgetsForHousehold(householdId)
+  const now = new Date()
+
+  const results = await Promise.all(
+    budgets.map(async (budget) => {
+      const periodStart = budget.period === "monthly"
+        ? new Date(now.getFullYear(), now.getMonth(), 1)
+        : new Date(now.getFullYear(), 0, 1)
+
+      const result = await prisma.transaction.aggregate({
+        where: {
+          householdId: budget.householdId,
+          categoryId: budget.categoryId ?? undefined,
+          type: "expense",
+          date: { gte: periodStart },
+          deletedAt: null,
+        },
+        _sum: { amount: true },
+      })
+
+      const spent = Number(result._sum.amount ?? 0)
+      const limit = Number(budget.amount)
+
+      return {
+        ...budget,
+        spent,
+        remaining: limit - spent,
+        percentage: Math.round((spent / limit) * 100),
+      }
+    })
+  )
+
+  return results
+}
+
 // calculate how much has been spent against a budget in its period
 export async function getBudgetSpending(budgetId: string) {
   const budget = await prisma.budget.findUnique({ where: { id: budgetId } })
