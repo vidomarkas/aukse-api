@@ -9,7 +9,10 @@ export const createAccountSchema = z.object({
   householdId: z.string().uuid().optional(),
 })
 
-export const updateAccountSchema = createAccountSchema.partial()
+// No defaults on update: a partial update must not reset the balance to 0 or clear isDefault.
+export const updateAccountSchema = createAccountSchema
+  .extend({ balance: z.number(), isDefault: z.boolean() })
+  .partial()
 
 export type CreateAccountInput = z.infer<typeof createAccountSchema>
 export type UpdateAccountInput = z.infer<typeof updateAccountSchema>

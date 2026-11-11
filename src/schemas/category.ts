@@ -8,7 +8,8 @@ export const createCategorySchema = z.object({
   isIncome: z.boolean().default(false),
 })
 
-export const updateCategorySchema = createCategorySchema.partial()
+// No defaults on update: renaming an income category must not turn it into an expense category.
+export const updateCategorySchema = createCategorySchema.extend({ isIncome: z.boolean() }).partial()
 
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>
