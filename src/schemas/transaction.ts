@@ -16,7 +16,11 @@ export const createTransactionSchema = z.object({
   tagIds: z.array(z.string().uuid()).optional(),
 })
 
-export const updateTransactionSchema = createTransactionSchema.partial()
+// No defaults on update: `type` defaults to "expense" when creating, but a partial update
+// (e.g. only a new category) must leave the existing type alone.
+export const updateTransactionSchema = createTransactionSchema
+  .extend({ type: z.enum(["expense", "income", "transfer"]) })
+  .partial()
 
 export const listTransactionsSchema = z.object({
   householdId: z.string().uuid(),

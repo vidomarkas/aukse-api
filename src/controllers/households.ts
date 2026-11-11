@@ -35,6 +35,12 @@ export async function update(req: Request, res: Response) {
 
 export async function remove(req: Request, res: Response) {
   const { id } = req.params as { id: string }
+  // Only the household's admin may delete it (this endpoint used to accept any signed-in user).
+  const role = await householdService.getMemberRole(id, req.user!.id)
+  if (role !== "owner") {
+    res.status(role ? 403 : 404).json({ error: role ? "Only the admin can delete this household" : "Household not found" })
+    return
+  }
   await householdService.deleteHousehold(id)
   res.status(204).send()
 }

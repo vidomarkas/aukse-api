@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client"
 import { prisma } from "../lib/prisma"
 import { CreateHouseholdInput, UpdateHouseholdInput } from "../schemas/household"
 
@@ -45,10 +46,33 @@ export async function updateHousehold(id: string, input: UpdateHouseholdInput) {
   })
 }
 
+/**
+ * Deletes a household and everything in it, in an order the database accepts. Categories, tags and
+ * accounts have no cascade rule, so a plain delete fails once the household has any of its own.
+ */
+export async function purgeHousehold(tx: Prisma.TransactionClient, id: string) {
+  // Transactions first: they reference recurring payments, accounts and categories. Tags on them cascade.
+  await tx.transaction.deleteMany({ where: { householdId: id } })
+  await tx.recurringTransaction.deleteMany({ where: { householdId: id } })
+  await tx.budget.deleteMany({ where: { householdId: id } })
+  await tx.tag.deleteMany({ where: { householdId: id } })
+  await tx.category.deleteMany({ where: { householdId: id } })
+  await tx.account.deleteMany({ where: { householdId: id } })
+  await tx.invitation.deleteMany({ where: { householdId: id } })
+  await tx.householdMember.deleteMany({ where: { householdId: id } })
+  await tx.household.delete({ where: { id } })
+}
+
 export async function deleteHousehold(id: string) {
-  return prisma.household.delete({
-    where: { id },
+  return prisma.$transaction((tx) => purgeHousehold(tx, id))
+}
+
+export async function getMemberRole(householdId: string, userId: string) {
+  const member = await prisma.householdMember.findUnique({
+    where: { householdId_userId: { householdId, userId } },
+    select: { role: true },
   })
+  return member?.role ?? null
 }
 
 export async function getMembers(householdId: string) {

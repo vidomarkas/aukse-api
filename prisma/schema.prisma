@@ -275,7 +275,10 @@ model RecurringTransaction {
   endDate     DateTime? @db.Date     // null = runs forever
   nextDueDate DateTime  @db.Date     // cron job queries this
 
-  isActive    Boolean   @default(true)
+  isActive    Boolean   @default(true)  // false = paused
+  // true: added as a transaction on its due date. false: waits for the user to confirm the real
+  // amount (variable bills like electricity).
+  autoAdd     Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 

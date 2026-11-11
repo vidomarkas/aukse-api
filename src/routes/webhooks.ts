@@ -1,6 +1,7 @@
 import express, { Router, Request, Response } from "express"
 import { Webhook } from "svix"
 import { prisma } from "../lib/prisma"
+import { deleteAccountData } from "../services/account"
 
 const router = Router()
 
@@ -42,11 +43,10 @@ router.post(
       })
     }
 
-    if (event.type === "user.deleted") {
-      await prisma.user.update({
-        where: { id: event.data.id },
-        data: { deletedAt: new Date() },
-      })
+    if (event.type === "user.deleted" && event.data?.id) {
+      // Backup for deletions made outside Aukse (e.g. in the Clerk dashboard). Same clean-up as
+      // "Delete account" in Settings; safe to run again if it already happened.
+      await deleteAccountData(event.data.id)
     }
 
     res.json({ received: true })
