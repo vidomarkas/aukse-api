@@ -7,6 +7,7 @@ import budgetRoutes from "./budgets"
 import webhookRoutes from "./webhooks"
 import analyticsRoutes from "./analytics"
 import invitationRoutes from "./invitations"
+import recurringRoutes from "./recurring"
 
 
 
@@ -21,6 +22,7 @@ router.use("/categories", categoryRoutes)
 router.use("/budgets", budgetRoutes)
 router.use("/analytics", analyticsRoutes)
 router.use("/invitations", invitationRoutes)
+router.use("/recurring", recurringRoutes)
 
 
 
