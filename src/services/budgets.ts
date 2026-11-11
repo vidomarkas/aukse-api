@@ -1,6 +1,33 @@
 import { prisma } from "../lib/prisma"
 import { CreateBudgetInput, UpdateBudgetInput } from "../schemas/budget"
 
+/**
+ * Another budget for the same category (or another monthly-total budget, when `categoryId` is null)
+ * with the same period and overlapping dates. Two such budgets would double up on the dashboard.
+ */
+export async function findConflictingBudget(candidate: {
+  householdId: string
+  categoryId: string | null
+  period: "monthly" | "yearly"
+  startDate: Date
+  endDate: Date | null
+  excludeId?: string
+}) {
+  return prisma.budget.findFirst({
+    where: {
+      householdId: candidate.householdId,
+      // Explicit null: in Prisma, `undefined` would mean "any category".
+      categoryId: candidate.categoryId,
+      period: candidate.period,
+      ...(candidate.excludeId && { id: { not: candidate.excludeId } }),
+      // Date ranges overlap: the other one starts before this one ends, and ends after this one starts.
+      ...(candidate.endDate && { startDate: { lte: candidate.endDate } }),
+      OR: [{ endDate: null }, { endDate: { gte: candidate.startDate } }],
+    },
+    include: { category: true },
+  })
+}
+
 export async function createBudget(input: CreateBudgetInput) {
   return prisma.budget.create({
     data: {
