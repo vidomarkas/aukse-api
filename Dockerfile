@@ -21,19 +21,19 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-RUN apk add --no-cache dumb-init
+RUN apk add --no-cache dumb-init \
+  && addgroup -S nodejs && adduser -S nodejs -G nodejs \
+  && chown nodejs:nodejs /app
 
-# Copy compiled output, prisma files, and all node_modules (includes prisma CLI for migrations)
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
-COPY package.json ./
-COPY prisma.config.ts ./
-COPY docker-entrypoint.sh ./
+# Copy compiled output, prisma files, and all node_modules (includes prisma CLI for migrations).
+# Ownership is set while copying: a separate `chown -R` afterwards took minutes and duplicated
+# node_modules into another image layer, roughly doubling the image size.
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
+COPY --chown=nodejs:nodejs package.json prisma.config.ts docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
 
-RUN addgroup -S nodejs && adduser -S nodejs -G nodejs \
-  && chown -R nodejs:nodejs /app
 USER nodejs
 
 EXPOSE 3000
